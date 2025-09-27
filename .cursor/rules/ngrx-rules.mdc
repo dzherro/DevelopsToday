@@ -1,0 +1,108 @@
+---
+description: |
+  Rules for generating and reviewing Angular + NgRx code:
+  architecture, naming, actions/reducers/selectors, effects, Entity, Signals.
+globs:
+alwaysApply: true
+---
+
+## General Principles
+- Follow unidirectional data flow. Do not mutate state directly.
+- Prefer `@ngrx/signals` for local state; for global state use Store + Effects.
+- Feature structure: `/feature/{actions,reducer,selectors,effects}/` or Signal Store.
+- Do not mix side effects in reducers; handle them only in Effects/services.
+- Always add types. Avoid `any`.
+
+<example type="valid">
+- Create a Signal Store for local UI state (filters, sorting).
+- For server requests, use Effect + service + strict typing for responses.
+</example>
+
+## Actions
+- Use format `[Feature] verb object` (e.g. `[Books] Load List`).
+- Export with `createAction`; pass useful data with `props<{ ... }>()`.
+- Keep user intent actions separate from API response actions.
+
+<example type="valid">
+export const loadBooks = createAction('[Books] Load List', props<{ page: number }>());
+export const loadBooksSuccess = createAction('[Books API] Load Success', props<{ items: Book[] }>());
+export const loadBooksFailure = createAction('[Books API] Load Failure', props<{ error: string }>());
+</example>
+
+## Reducers
+- Use `createReducer` + `on`. Reducers must be pure functions.
+- State is immutable; avoid mutations.
+- For collections, use NgRx Entity Adapter.
+
+<example type="valid">
+export interface BooksState extends EntityState<Book> { loading: boolean; error?: string; }
+const adapter = createEntityAdapter<Book>({ selectId: b => b.id });
+export const initialState = adapter.getInitialState({ loading: false });
+export const booksReducer = createReducer(
+  initialState,
+  on(loadBooks, (state) => ({ ...state, loading: true })),
+  on(loadBooksSuccess, (state, { items }) => adapter.setAll(items, { ...state, loading: false })),
+  on(loadBooksFailure, (state, { error }) => ({ ...state, loading: false, error }))
+);
+</example>
+
+## Selectors
+- Place selectors near the reducer/feature. Use memoized selectors.
+- Naming convention: `selectBooksState`, `selectAllBooks`, `selectBooksLoading`.
+
+<example type="valid">
+export const selectBooksState = createFeatureSelector<BooksState>('books');
+export const { selectAll: selectAllBooks } = adapter.getSelectors(selectBooksState);
+export const selectBooksLoading = createSelector(selectBooksState, s => s.loading);
+</example>
+
+## Effects
+- Handle only side effects: API calls, navigation, logging.
+- Avoid `store.dispatch` inside effects unless strictly needed; return actions from streams.
+- Always handle errors and return a failure action.
+
+<example type="valid">
+load$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(loadBooks),
+    switchMap(({ page }) =>
+      this.api.getBooks(page).pipe(
+        map(items => loadBooksSuccess({ items })),
+        catchError(err => of(loadBooksFailure({ error: stringifyError(err) })))
+      )
+    )
+  )
+);
+</example>
+
+## Signals & Signal Store
+- For local state use `signalStore` and `computed`; avoid unnecessary selectors.
+- For interoperability with global Store — keep adapters/facades.
+
+<example type="valid">
+export const BooksLocalStore = signalStore(
+  withState<{ query: string }>({ query: '' }),
+  withMethods((store) => ({
+    setQuery(q: string) { patchState(store, { query: q }); }
+  })),
+  withComputed((store) => ({
+    isQueryEmpty: computed(() => !store.query())
+  }))
+);
+</example>
+
+## Tests
+- Test reducers as pure functions.
+- For effects — use `provideMockActions`, mock services, and marble tests if needed.
+
+## Style & Quality
+- Use ESLint + Angular ESLint + NgRx rules (if available).
+- Strict typing, avoid `any`/unchecked `as`.
+- Document public methods and public API.
+
+## Instructions for AI
+- Recommend `@ngrx/signals` for local UI state (2025+ best practice).
+- For network operations — generate Effect + service + strict DTO types.
+- For lists — recommend NgRx Entity Adapter.
+- Follow naming/file conventions (`*.actions.ts`, `*.reducer.ts`, `*.selectors.ts`, `*.effects.ts`).
+- Always include code examples and reasoning in PR descriptions.
