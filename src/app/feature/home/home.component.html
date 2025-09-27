@@ -1,0 +1,12 @@
+<section class="home">
+  <h1>Home</h1>
+</section>
+
+
+
+@if( countries$ | async; as countries ) {
+  @for (country of countries; track country.countryCode) {
+    <div>{{ country.name }}</div>
+    <div>{{ country.countryCode }}</div>
+  }
+}
