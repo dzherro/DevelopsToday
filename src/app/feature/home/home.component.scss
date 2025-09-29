@@ -1,0 +1,49 @@
+// The styles for the cards were generated using Cursor
+// to save time and because it is irrelevant when performing the test task.
+
+.home {
+    --home-gap: 16px;
+    --home-title-color: #111827;
+    --home-bg: #f9fafb;
+    --home-input-border: #e5e7eb;
+    --home-input-bg: #fff;
+    --home-input-text: #111827;
+
+    color: #111827;
+    background: var(--home-bg);
+
+    &__title {
+        margin: 0 0 20px;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--home-title-color);
+    }
+
+    &__search {
+        margin: 0 0 var(--home-gap);
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--home-input-border);
+            border-radius: 10px;
+            background: var(--home-input-bg);
+            color: var(--home-input-text);
+            font-size: 14px;
+            transition: box-shadow 160ms ease, border-color 160ms ease;
+
+            &:focus {
+                outline: none;
+                border-color: #9aa7ff;
+                box-shadow: 0 0 0 4px rgba(47, 47, 254, 0.08);
+            }
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--home-gap);
+    }
+}

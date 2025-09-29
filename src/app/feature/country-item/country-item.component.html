@@ -1,0 +1,42 @@
+<article class="country-card">
+  <div class="country-card__header">
+    <h2 class="country-card__title">{{ country.name }}</h2>
+  </div>
+  <div class="country-card__meta">
+    <span class="country-card__code-label">Country Code:</span>
+    <span class="country-card__code">{{ country.countryCode }}</span>
+  </div>
+
+  @if (holiday) {
+    <div class="country-card__holiday">
+      <div class="country-card__holiday-name">{{ holiday.name }}</div>
+      <time
+        class="country-card__holiday-date"
+        [attr.datetime]="holiday.date"
+        >{{ holiday.date | date: 'mediumDate' }}</time
+      >
+    </div>
+  }
+
+  @if (weekend) {
+    <div class="country-card__weekend">
+      <div class="country-card__weekend-range">
+        <time [attr.datetime]="weekend.startDate">{{
+          weekend.startDate | date: 'mediumDate'
+        }}</time>
+        —
+        <time [attr.datetime]="weekend.endDate">{{ weekend.endDate | date: 'mediumDate' }}</time>
+      </div>
+      <div class="country-card__weekend-days">{{ weekend.dayCount }} days</div>
+    </div>
+  }
+
+  <div class="country-card__actions">
+    <button
+      (click)="navigateToCountry()"
+      class="country-card__button"
+    >
+      View Info
+    </button>
+  </div>
+</article>

@@ -1,0 +1,17 @@
+<section class="random-widget">
+  <h2 class="random-widget__title">Random Countries</h2>
+
+  @if (countriesWithData$ | async; as items) {
+    <div class="random-widget__grid">
+      @for (item of items; track item.country.countryCode) {
+        <app-country-item
+          [country]="item.country"
+          [holiday]="item.holidays[0]"
+          [weekend]="item.weekend"
+        />
+      }
+    </div>
+  } @else {
+    <div class="random-widget__empty">No countries selected</div>
+  }
+</section>

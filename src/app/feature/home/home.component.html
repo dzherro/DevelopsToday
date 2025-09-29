@@ -1,12 +1,25 @@
 <section class="home">
-  <h1>Home</h1>
-</section>
+  <h1 class="home__title">Home</h1>
 
+  <div class="home__search">
+    <input
+      type="text"
+      placeholder="Search countries..."
+      (input)="onSearch($event)"
+    />
+  </div>
 
+  @if (countries$ | async; as countries) {
+    <app-random-countries-widget
+      [maxItems]="maxItems"
+      [year]="year"
+      [countries]="countries"
+    />
 
-@if( countries$ | async; as countries ) {
-  @for (country of countries; track country.countryCode) {
-    <div>{{ country.name }}</div>
-    <div>{{ country.countryCode }}</div>
+    <div class="home__grid">
+      @for (country of countries; track country.countryCode) {
+        <app-country-item [country]="country" />
+      }
+    </div>
   }
-}
+</section>

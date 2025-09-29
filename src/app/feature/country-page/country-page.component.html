@@ -1,0 +1,65 @@
+<section class="country-page">
+  <div class="country-page__header">
+    <h1 class="country-page__title">Country {{ countryCode }}</h1>
+    <div class="country-page__years">
+      @for (year of years; track $index) {
+        <button
+          type="button"
+          class="country-page__year-btn {{
+            year === selectedYear ? 'country-page__year-btn--active' : ''
+          }}"
+          (click)="onYearSelect(year)"
+        >
+          {{ year }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (holidays$ | async; as holidays) {
+    <section class="country-page__section">
+      <h2 class="country-page__subtitle">Holidays</h2>
+      <ul class="country-page__list">
+        @for (holiday of holidays; track $index) {
+          <li class="country-page__item">
+            <div class="country-page__holiday-name">{{ holiday.name }}</div>
+            <time
+              class="country-page__holiday-date"
+              [attr.datetime]="holiday.date"
+            >
+              {{ holiday.date | date: 'mediumDate' }}
+            </time>
+            <div class="country-page__chips">
+              <span class="country-page__chip">{{ holiday.countryCode }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (weekends$ | async; as weekends) {
+    <section class="country-page__section">
+      <h2 class="country-page__subtitle">Weekends</h2>
+      <ul class="country-page__list">
+        @for (weekend of weekends; track $index) {
+          <li class="country-page__item">
+            <div class="country-page__weekend-range">
+              <time [attr.datetime]="weekend.startDate">{{
+                weekend.startDate | date: 'mediumDate'
+              }}</time>
+              —
+              <time [attr.datetime]="weekend.endDate">{{
+                weekend.endDate | date: 'mediumDate'
+              }}</time>
+            </div>
+            <div class="country-page__weekend-days">{{ weekend.dayCount }} days</div>
+          </li>
+        }
+      </ul>
+      <div class="country-page__chips">
+        <span class="country-page__chip">Amount: {{ weekends.length }}</span>
+      </div>
+    </section>
+  }
+</section>
